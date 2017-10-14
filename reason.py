@@ -10,14 +10,29 @@ class Quantity:
         self.space = space
 
 
+def iPlus(a, b):
+    if a.derivative == '+':
+        b.derivative = '+'
+
+
+def iMinus(a, b):
+    if a.derivative == '+':
+        b.derivative = '-'
+
+
 class State:
 
     def turn_on_tap(self):
         self.quantities['inflow'].set_derivative_positive()
 
     def display_state(self):
+        print('-----------')
         for name, quantity in self.quantities.items():
             print(name, quantity.quantity, quantity.derivative)
+
+    def infer(self):
+        for f in self.dependencies:
+            f()
 
     def __init__(self):
 
@@ -29,14 +44,15 @@ class State:
             'outflow': outflow, 'volume': volume, 'inflow': inflow
         }
 
-        self.dependencies = {
-            (inflow, volume, 'i+'),
-            (outflow, inflow, 'i-'),
-            (volume, outflow, 'p+'),
-            (outflow, volume, 'vc_max'),
-            (volume, outflow, 'vc_0')
-        }
+        self.dependencies = [
+            lambda: iPlus(inflow, volume),
+            lambda: iMinus(outflow, volume),
+        ]
 
 
-initial_state = State()
-initial_state.display_state()
+state = State()
+state.display_state()
+state.turn_on_tap()
+state.display_state()
+state.infer()
+state.display_state()
