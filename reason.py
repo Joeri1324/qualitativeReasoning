@@ -20,6 +20,16 @@ def iMinus(a, b):
         b.derivative = '-'
 
 
+def vcMax(a, b):
+    if a.quantity == 'max':
+        b.quantity == 'max'
+
+
+def vcZeros(a, b):
+    if a.quantity == '0':
+        b.quantity
+
+
 class State:
 
     def turn_on_tap(self):
@@ -47,6 +57,8 @@ class State:
         self.dependencies = [
             lambda: iPlus(inflow, volume),
             lambda: iMinus(outflow, volume),
+            lambda: vcMax(volume, outflow),
+            lambda: vcZeros(volume, outflow)
         ]
 
 
