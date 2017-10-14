@@ -22,12 +22,12 @@ def iMinus(a, b):
 
 def vcMax(a, b):
     if a.quantity == 'max':
-        b.quantity == 'max'
+        b.quantity = 'max'
 
 
 def vcZeros(a, b):
     if a.quantity == '0':
-        b.quantity
+        b.quantity = 0
 
 
 class State:
