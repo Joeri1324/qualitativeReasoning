@@ -14,34 +14,47 @@ class Quantity:
 
 
 def iPlus(state, a, b):
-    copy = state.copy()
-    if state.quantities[a].derivative == '+':
-        copy.quantities[b].derivative = '+'
-        return copy
-    return False
+    if state.quantities[a].quantity == '+':
+        state.quantities[b].derivative = '+'
+    return state
 
 
 def iMinus(state, a, b):
-    copy = state.copy()
-    if state.quantities[a].derivative == '+':
-        copy.quantities[b].derivative = '-'
-        return copy
-    return False
+    if state.quantities[a].quantity == '+':
+        state.quantities[b].derivative = '-'
+    return state
 
 
 def vcMax(state, a, b):
-    copy = state.copy()
     if state.quantities[a].quantity == 'max' and state.quantities[b].quantity != 'max':
-        copy.quantities[b].quantity = 'max'
-        return copy
-    return False
+        state.quantities[b].quantity = 'max'
+    return state
 
 
 def vcZeros(state, a, b):
-    copy = state.copy()
     if state.quantities[a].quantity == '0' and state.quantities[b].quantity != '0':
-        copy.quantities[b].quantity = 0
-        return copy
+        state.quantities[b].quantity = '0'
+    return state
+
+
+def proportional(state, a, b):
+    if state.quantities[a].derivative == '+' and state.quantities[b].quantity != '+':
+        state.quantities[b].derivative = '+'
+    return state
+
+
+def derivative(state, quantities, _):
+    mutation = False
+    for q in quantities:
+        index = state.quantities[q].space.index(state.quantities[q].quantity)
+        if state.quantities[q].derivative == '+' and (index + 1) != len(state.quantities[q].space):
+            state.quantities[q].quantity = state.quantities[q].space[index + 1]
+            mutation = True
+        if state.quantities[q].derivative == '-' and (index ) != 0:
+            state.quantities[q].quantity = state.quantities[q].space[index - 1]
+            mutation = True
+    if mutation:
+        return state
     return False
 
 
@@ -58,8 +71,13 @@ class State:
             print(name, quantity.quantity, quantity.derivative)
 
     def infer(self):
-        return [f[0](self, f[1], f[2]) for f in self.dependencies
-                if f[0](self, f[1], f[2])]
+        copy = self.copy()
+        result = derivative(copy, ['inflow', 'outflow', 'volume'], 'hoi')
+        if result:
+            return result
+        for f in self.dependencies:
+            copy = f[0](copy, f[1], f[2])
+        return copy
 
     def copy(self):
         return copy.deepcopy(self)
@@ -78,7 +96,8 @@ class State:
             (iPlus, 'inflow', 'volume'),
             (iMinus, 'outflow', 'volume'),
             (vcMax, 'volume', 'outflow'),
-            (vcZeros, 'volume', 'outflow')
+            (vcZeros, 'volume', 'outflow'),
+            (proportional, 'volume', 'outflow'),
         ]
 
 
@@ -87,5 +106,13 @@ state.display_state()
 new_state = state.turn_on_tap()
 new_state.display_state()
 
-for s in new_state.infer():
-    s.display_state()
+ss = new_state.infer()
+ss.display_state()
+ss = ss.infer()
+ss.display_state()
+ss = ss.infer()
+ss.display_state()
+ss = ss.infer()
+ss.display_state()
+ss = ss.infer()
+ss.display_state()
