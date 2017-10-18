@@ -106,6 +106,10 @@ def derivative(state):
     copy = state.copy()
     for name, q in state.quantities.items():
         index = q.space.index(q.quantity)
+        if copy.quantities[name].quantity == 'max' and copy.quantities[name].derivative == '+':
+            copy.quantities[name].derivative = '0'
+        if copy.quantities[name].quantity == '0' and copy.quantities[name].derivative == '-':
+            copy.quantities[name].derivative = '0'
         if q.derivative == '+' and (index + 1) != len(q.space):
             copy.quantities[name].quantity = q.space[index + 1]
         if q.derivative == '-' and (index) != 0:
@@ -198,21 +202,26 @@ class Tree:
         self.leaf_nodes = [self.root]
 
 
-water_system = State()
-water_system = water_system.turn_on_tap()
-
-t = Tree(water_system)
-result = t.bread()
-
-dot = Digraph(comment='The Round Table')
-
-
 def state_to_string(state):
     return ('i: \t' + str(state[2][0]) + '\t' + str(state[2][1]) + '\n'
             'v: \t' + str(state[1][0]) + '\t'+str(state[1][1]) + '\n'
             'o: \t' + str(state[0][0]) + '\t'+str(state[0][1]) + '\n'
             'h: \t' + str(state[3][0]) + '\t'+str(state[3][1]) + '\n'
             'p: \t' + str(state[4][0]) + '\t'+str(state[4][1]) + '\n')
+
+
+dot = Digraph(comment='The Round Table')
+water_system = State()
+dot.node('0', state_to_string(mappi(water_system)))
+dot.edge('0', '1')
+water_system = water_system.turn_on_tap()
+
+t = Tree(water_system)
+result = t.bread()
+
+
+
+
 
 
 edges = set()
