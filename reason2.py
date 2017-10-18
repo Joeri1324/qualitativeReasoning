@@ -1,6 +1,6 @@
 import copy
 import itertools
-
+from graphviz import Digraph
 
 class Quantity:
 
@@ -181,4 +181,24 @@ water_system = State()
 water_system = water_system.turn_on_tap()
 
 t = Tree(water_system)
-print(t.bread())
+result = t.bread()
+
+dot = Digraph(comment='The Round Table')
+
+
+def state_to_string(state):
+    return 'i: ' + str(state[2][0])+str(state[2][1]) + 'v: ' + str(state[1][0])+str(state[1][1]) + 'o: ' + str(state[0][0])+str(state[0][1])
+
+
+for key, value in result.items():
+    number = value['number']
+    dot.node(str(number), state_to_string(key))
+    for child in value['children']:
+        dot.edge(str(number), str(result[child]['number']))
+
+# dot.node('A', 'King Arthur')
+# dot.node('B', 'Sir Bedevere the Wise')
+# dot.node('L', 'Sir Lancelot the Brave')
+# dot.edges(['AB', 'AL'])
+# dot.edge('B', 'L', constraint='false')
+dot.render('test-output/round-table.gv', view=True)
