@@ -38,10 +38,20 @@ class State:
             'outflow': outflow, 'volume': volume, 'inflow': inflow
         }
 
+
 def proportional(state, a, b):
-    if state.quantities[a].derivative == '+' and state.quantities[b].quantity != '+':
-        state.quantities[b].derivative = '+'
+    if state.quantities[a].derivative == '+':
+        if state.quantities[b].derivative == '-':
+            state.quantities[b].derivative = '0'
+        if state.quantities[b].derivative == '0':
+            state.quantities[b].derivative = '+'
+    if state.quantities[a].derivative == '-':
+        if state.quantities[b].derivative == '+':
+            state.quantities[b].derivative = '0'
+        if state.quantities[b].derivative == '0':
+            state.quantities[b].derivative = '-'
     return state
+
 
 def vc(state, a, b):
     if state.quantities[a].quantity == 'max':
@@ -49,6 +59,7 @@ def vc(state, a, b):
     if state.quantities[a].quantity == '0':
         state.quantities[b].quantity = '0'
     return state
+
 
 def iPplusMinus(state, a, b, c):
     q1 = state.quantities[a]
