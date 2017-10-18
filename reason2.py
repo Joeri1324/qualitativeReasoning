@@ -106,19 +106,19 @@ def derivative(state):
     copy = state.copy()
     for name, q in state.quantities.items():
         index = q.space.index(q.quantity)
-        if copy.quantities[name].quantity == 'max' and copy.quantities[name].derivative == '+':
-            copy.quantities[name].derivative = '0'
-        if copy.quantities[name].quantity == '0' and copy.quantities[name].derivative == '-':
-            copy.quantities[name].derivative = '0'
+        # if copy.quantities[name].quantity == 'max' and copy.quantities[name].derivative == '+':
+        #     copy.quantities[name].derivative = '0'
+        # if copy.quantities[name].quantity == '0' and copy.quantities[name].derivative == '-':
+        #     copy.quantities[name].derivative = '0'
         if q.derivative == '+' and (index + 1) != len(q.space):
             copy.quantities[name].quantity = q.space[index + 1]
         if q.derivative == '-' and (index) != 0:
             copy.quantities[name].quantity = q.space[index - 1]
 
-        if copy.quantities[name].quantity == 'max' and copy.quantities[name].derivative == '+':
-            copy.quantities[name].derivative = '0'
-        if copy.quantities[name].quantity == '0' and copy.quantities[name].derivative == '-':
-            copy.quantities[name].derivative = '0'
+        # if copy.quantities[name].quantity == 'max' and copy.quantities[name].derivative == '+':
+        #     copy.quantities[name].derivative = '0'
+        # if copy.quantities[name].quantity == '0' and copy.quantities[name].derivative == '-':
+        #     copy.quantities[name].derivative = '0'
 
     return copy
 
