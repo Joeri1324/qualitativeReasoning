@@ -187,7 +187,9 @@ dot = Digraph(comment='The Round Table')
 
 
 def state_to_string(state):
-    return 'i: ' + str(state[2][0])+str(state[2][1]) + 'v: ' + str(state[1][0])+str(state[1][1]) + 'o: ' + str(state[0][0])+str(state[0][1])
+    return ('i: \t' + str(state[2][0])+ '\t' + str(state[2][1]) + '\n'
+            'v: \t' + str(state[1][0])+'\t'+str(state[1][1]) + '\n'
+            'o: \t' + str(state[0][0])+ '\t'+str(state[0][1]))
 
 
 for key, value in result.items():
