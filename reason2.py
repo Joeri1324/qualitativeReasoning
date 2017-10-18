@@ -132,50 +132,53 @@ def infer_list(states):
 
 def mappi(state):
     return tuple([(state.quantities[s].quantity, state.quantities[s].derivative)
-                for s in state.quantities])
+                 for s in state.quantities])
 
 
-def bread_first(state):
-    visited = {mappi(state)}
-    states = infer_list([state])
-    print('********')
-    for s in states:
-        s.display_state()
-    while states:
+class Tree:
+
+    def bread_first(state):
+        visited = {mappi(state)}
+        states = infer_list([state])
         print('********')
-        states = [x for x in infer_list(states) if mappi(x) not in visited]
         for s in states:
             s.display_state()
-        for s in states:
-            visited.add(mappi(s))
-    print('bgbgbgb', len(visited))
+        while states:
+            print('********')
+            states = [x for x in infer_list(states) if mappi(x) not in visited]
+            for s in states:
+                s.display_state()
+            for s in states:
+                visited.add(mappi(s))
+        print('bgbgbgb', len(visited))
+
+    def bread(self):
+        to_do = self.leaf_nodes
+        visited = {mappi(to_do[0]['state']): {'number': to_do[0]['number'],
+                                              'children': []}}
+        while to_do:
+            node = to_do.pop()
+            next_states = infer(node['state'])
+            node['children'] = []
+            for state in next_states:
+                visited_already = visited.get(mappi(state))
+                if not visited_already:
+                    self.amount_of_nodes += 1
+                    new_node = {'state': state, 'number': self.amount_of_nodes}
+                    visited[mappi(state)] = {'number': self.amount_of_nodes, 'children': []}
+                    to_do.append(new_node)
+                visited.get(mappi(node['state']))['children'].append(mappi(state))
+                node['children'].append(new_node)
+        return visited
+
+    def __init__(self, root):
+        self.amount_of_nodes = 1
+        self.root = {'state': root, 'number': 1}
+        self.leaf_nodes = [self.root]
 
 
 water_system = State()
 water_system = water_system.turn_on_tap()
-water_system.display_state()
-bread_first(water_system)
-# states = infer(water_system)
-# print()
-# for s in states:
-#     s.display_state()
-#
-# print()
-# states = infer_list(states)
-# for s in states:
-#     s.display_state()
-# #
-# states = infer_list(states)
-# print()
-# for s in states:
-#     s.display_state()
-#
-# states = infer_list(states)
-# print()
-# for s in states:
-#     s.display_state()
-#
-# states = infer_list(states)
-# print()
-# for s in states:
-#     s.display_state()
+
+t = Tree(water_system)
+print(t.bread())
