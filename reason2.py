@@ -33,9 +33,12 @@ class State:
         outflow = Quantity(['0', '+', 'max'])
         volume = Quantity(['0', '+', 'max'])
         inflow = Quantity(['0', '+'])
+        height = Quantity(['0', '+', 'max'])
+        pressure = Quantity(['0', '+', 'max'])
 
         self.quantities = {
-            'outflow': outflow, 'volume': volume, 'inflow': inflow
+            'outflow': outflow, 'volume': volume, 'inflow': inflow,
+            'pressure': pressure, 'height': height
         }
 
 
@@ -129,9 +132,16 @@ def polynomial_tap(state):
 
 def infer(state):
     der_app_state = derivative(state)
+    der_app_state = vc(der_app_state, 'volume', 'height')
     der_app_state = vc(der_app_state, 'volume', 'outflow')
+    der_app_state = vc(der_app_state, 'height', 'volume')
+    der_app_state = vc(der_app_state, 'height', 'pressure')
+    der_app_state = vc(der_app_state, 'pressure', 'height')
+    der_app_state = vc(der_app_state, 'pressure', 'outflow')
     next_states = iPplusMinus(der_app_state, 'inflow', 'outflow', 'volume')
-    next_states = [proportional(s, 'volume', 'outflow') for s in next_states]
+    next_states = [proportional(s, 'volume', 'height') for s in next_states]
+    next_state = [proportional(s, 'height', 'pressure') for s in next_states]
+    next_state = [proportional(s, 'pressure', 'outflow') for s in next_states]
     # next_states = [vc(s, 'volume', 'outflow') for s in next_states]
     next_states = list(itertools.chain(*[polynomial_tap(s) for s in next_states]))
     return next_states
@@ -200,7 +210,9 @@ dot = Digraph(comment='The Round Table')
 def state_to_string(state):
     return ('i: \t' + str(state[2][0]) + '\t' + str(state[2][1]) + '\n'
             'v: \t' + str(state[1][0]) + '\t'+str(state[1][1]) + '\n'
-            'o: \t' + str(state[0][0]) + '\t'+str(state[0][1]))
+            'o: \t' + str(state[0][0]) + '\t'+str(state[0][1]) + '\n'
+            'h: \t' + str(state[3][0]) + '\t'+str(state[3][1]) + '\n'
+            'p: \t' + str(state[4][0]) + '\t'+str(state[4][1]) + '\n')
 
 
 edges = set()
