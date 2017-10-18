@@ -198,16 +198,20 @@ dot = Digraph(comment='The Round Table')
 
 
 def state_to_string(state):
-    return ('i: \t' + str(state[2][0])+ '\t' + str(state[2][1]) + '\n'
-            'v: \t' + str(state[1][0])+'\t'+str(state[1][1]) + '\n'
-            'o: \t' + str(state[0][0])+ '\t'+str(state[0][1]))
+    return ('i: \t' + str(state[2][0]) + '\t' + str(state[2][1]) + '\n'
+            'v: \t' + str(state[1][0]) + '\t'+str(state[1][1]) + '\n'
+            'o: \t' + str(state[0][0]) + '\t'+str(state[0][1]))
 
 
+edges = set()
 for key, value in result.items():
     number = value['number']
     dot.node(str(number), state_to_string(key))
     for child in value['children']:
-        dot.edge(str(number), str(result[child]['number']))
+        edge = str(number) + str(result[child]['number'])
+        if edge not in edges and number != result[child]['number']:
+            dot.edge(str(number), str(result[child]['number']))
+        edges.add(edge)
 
 # dot.node('A', 'King Arthur')
 # dot.node('B', 'Sir Bedevere the Wise')
