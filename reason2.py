@@ -123,6 +123,18 @@ def derivative(state):
     return copy
 
 
+def derivative2(state):
+    copy = state.copy()
+    for name, q in state.quantities.items():
+        if copy.quantities[name].quantity == 'max' and copy.quantities[name].derivative == '+':
+            copy.quantities[name].derivative = '0'
+            # print('name!!', name)
+        if copy.quantities[name].quantity == '0' and copy.quantities[name].derivative == '-':
+            copy.quantities[name].derivative = '0'
+    print('name!!', copy.quantities[name].quantity, copy.quantities[name].derivative)
+    return copy
+
+
 def polynomial_tap(state):
     copy = state.copy()
     if state.quantities['inflow'].derivative == '+':
@@ -144,10 +156,10 @@ def infer(state):
     der_app_state = vc(der_app_state, 'pressure', 'outflow')
     next_states = iPplusMinus(der_app_state, 'inflow', 'outflow', 'volume')
     next_states = [proportional(s, 'volume', 'height') for s in next_states]
-    next_state = [proportional(s, 'height', 'pressure') for s in next_states]
-    next_state = [proportional(s, 'pressure', 'outflow') for s in next_states]
-    # next_states = [vc(s, 'volume', 'outflow') for s in next_states]
+    next_states = [proportional(s, 'height', 'pressure') for s in next_states]
+    next_states = [proportional(s, 'pressure', 'outflow') for s in next_states]
     next_states = list(itertools.chain(*[polynomial_tap(s) for s in next_states]))
+    next_states = [derivative2(s) for s in next_states]
     return next_states
 
 
