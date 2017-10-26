@@ -147,7 +147,6 @@ def derivative2(state):
             copy.quantities[name].derivative = '0'
         if copy.quantities[name].quantity == '0' and copy.quantities[name].derivative == '-':
             copy.quantities[name].derivative = '0'
-    print('name!!', copy.quantities[name].quantity, copy.quantities[name].derivative)
     return copy
 
 
